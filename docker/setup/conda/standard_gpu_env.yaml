@@ -1,0 +1,38 @@
+name: developer
+channels:
+  - nvidia
+  - pytorch
+  - plotly
+  - anaconda
+  - conda-forge
+  - defaults
+dependencies:
+  - python
+  - seaborn
+  - pynetdicom
+  - plotly
+  - nibabel
+  - scipy
+  - pysimplegui
+  - cryptography
+  - numba
+  - streamlit
+  - imageio
+  - pydicom
+  - scikit-learn
+  - ipykernel
+  - pillow
+  - conda-forge:pandas
+  - cython
+  - numpy
+  - setuptools
+  - matplotlib
+  - tqdm
+  - pytorch-cuda=11.8
+  - torchaudio
+  - pytorch
+  - cudatoolkit
+  - torchvision
+  - conda-forge:cupy
+  - conda-forge:openpyxl=3.1.*
+prefix: ~/.conda/envs/developer
