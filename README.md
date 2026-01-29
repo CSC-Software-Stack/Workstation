@@ -1,210 +1,215 @@
-# CSC Software Stack's Workstation
+# CSC Workstation
 
-Ubuntu based container containing full desktop environments in officially supported flavors accessible via any modern web browser. Based on [Linuxserver's webtop](https://github.com/linuxserver/docker-webtop/tree/master).
+A Docker-based Ubuntu desktop workstation accessible via web browser, built on [linuxserver/docker-baseimage-kasmvnc](https://github.com/linuxserver/docker-baseimage-kasmvnc). Provides a MATE desktop environment with development tools pre-installed—designed for clinical and enterprise settings with SSL/certificate workarounds.
 
-The Webtop can be accessed at:
+## Features
 
-* http://yourhost:3000/
-* https://yourhost:3001/
+- **Full Ubuntu Desktop** - MATE desktop environment accessible from any modern web browser
+- **Pre-installed Development Tools**:
+  - [VS Code](https://code.visualstudio.com/) - Code editor
+  - [Miniforge](https://github.com/conda-forge/miniforge) - Conda package manager with mamba
+  - [Google Chrome](https://www.google.com/chrome/) - Web browser
+  - [GitHub Desktop](https://github.com/shiftkey/desktop) - Git GUI client
+- **Enterprise Compatible** - Built-in SSL certificate handling for networks with traffic inspection
+- **GPU Support** - Optional NVIDIA GPU passthrough for ML/AI workloads
+- **Persistent Storage** - User home directory persists across container restarts
 
-**Modern GUI desktop apps (including some flavors terminals) have issues with the latest Docker and syscall compatibility, you can use Docker with the `--security-opt seccomp=unconfined` setting to allow these syscalls**
+## Quick Start
 
-**Unlike our other containers these Desktops are not designed to be upgraded by Docker, you will keep your home directoy but anything you installed system level will be lost if you upgrade an existing container. To keep packages up to date instead use Ubuntu/Debians's own apt, Alpine's apk, Fedora's dnf, or Arch's pacman program**
+### Access the Desktop
 
-### Options in all KasmVNC based GUI containers
+Once running, access the workstation at:
+- **HTTP**: http://yourhost:3000/
+- **HTTPS**: https://yourhost:3001/
 
-This container is based on [Docker Baseimage KasmVNC](https://github.com/linuxserver/docker-baseimage-kasmvnc) which means there are additional environment variables and run configurations to enable or disable specific functionality.
+Default credentials: username `abc`, password as configured (default: `abc`)
 
-#### Optional environment variables
-
-| Variable | Description |
-| :----: | --- |
-| CUSTOM_PORT | Internal port the container listens on for http if it needs to be swapped from the default 3000. |
-| CUSTOM_HTTPS_PORT | Internal port the container listens on for https if it needs to be swapped from the default 3001. |
-| CUSTOM_USER | HTTP Basic auth username, abc is default. |
-| PASSWORD | HTTP Basic auth password, abc is default. If unset there will be no auth |
-| SUBFOLDER | Subfolder for the application if running a subfolder reverse proxy, need both slashes IE `/subfolder/` |
-| TITLE | The page title displayed on the web browser, default "KasmVNC Client". |
-| FM_HOME | This is the home directory (landing) for the file manager, default "/config". |
-| START_DOCKER | If set to false a container with privilege will not automatically start the DinD Docker setup. |
-| DRINODE | If mounting in /dev/dri for [DRI3 GPU Acceleration](https://www.kasmweb.com/kasmvnc/docs/master/gpu_acceleration.html) allows you to specify the device to use IE `/dev/dri/renderD128` |
-
-#### Optional run configurations
-
-| Variable | Description |
-| :----: | --- |
-| `--privileged` | Will start a Docker in Docker (DinD) setup inside the container to use docker in an isolated environment. For increased performance mount the Docker directory inside the container to the host IE `-v /home/user/docker-data:/var/lib/docker`. |
-| `-v /var/run/docker.sock:/var/run/docker.sock` | Mount in the host level Docker socket to either interact with it via CLI or use Docker enabled applications. |
-| `--device /dev/dri:/dev/dri` | Mount a GPU into the container, this can be used in conjunction with the `DRINODE` environment variable to leverage a host video card for GPU accelerated appplications. Only **Open Source** drivers are supported IE (Intel,AMDGPU,Radeon,ATI,Nouveau) |
-
-### Language Support - Internationalization
-
-The [universal internationalization](https://github.com/linuxserver/docker-mods/tree/universal-internationalization) docker mod can be used with any of these variants to provide non english language support. All you need to know is your specific iso-639 code for your your desired language. For example German is `de_DE.UTF-8` Chinese `zh_CN.UTF-8` a full list is here: 
-
-[https://github.com/linuxserver/docker-mods/tree/universal-internationalization#other-languages](https://github.com/linuxserver/docker-mods/tree/universal-internationalization#other-languages)
-
-To enable this pass the environment variables:
-
-```
--e DOCKER_MODS=linuxserver/mods:universal-internationalization
--e LC_ALL=zh_CN.UTF-8
-```
-
-The web interface has the option for "IME Input Mode" in Settings which will allow non english characters to be used from a non en_US keyboard on the client. Once enabled in conjunction with the mod it will perform the same as a local Linux installation set to your locale.
-
-### Lossless mode
-
-This container is capable of delivering a true lossless image at a high framerate to your web browser by changing the Stream Quality preset to "Lossless", more information [here](https://www.kasmweb.com/docs/latest/how_to/lossless.html#technical-background). In order to use this mode from a non localhost endpoint the HTTPS port on 3001 needs to be used. If using a reverse proxy to port 3000 specific headers will need to be set as outlined [here](https://github.com/linuxserver/docker-baseimage-kasmvnc#lossless).
-
-## Usage
-
-Here are some example snippets to help you get started creating a container.
-
-### docker-compose (recommended, [click here for more info](https://docs.linuxserver.io/general/docker-compose))
+### Docker Compose (Recommended)
 
 ```yaml
----
-version: "2.1"
 services:
   workstation:
     image: ghcr.io/csc-software-stack/workstation:latest
     container_name: workstation
     security_opt:
-      - seccomp:unconfined #optional
+      - seccomp:unconfined
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
-      - SUBFOLDER=/ #optional
-      - TITLE=csc_workstation #optional
-      - PASSWORD=password
+      - PASSWORD=yourpassword
+      - TITLE=CSC Workstation
     volumes:
-      - /path/to/data:/config
-      - /var/run/docker.sock:/var/run/docker.sock #optional
+      - workstation_data:/config
+      - /var/run/docker.sock:/var/run/docker.sock  # Optional: Docker access
     ports:
       - 3000:3000
-    devices:
-      - /dev/dri:/dev/dri #optional
-    shm_size: "1gb" #optional
+      - 3001:3001
+    shm_size: "1gb"
     restart: unless-stopped
+
+volumes:
+  workstation_data:
 ```
 
-### docker cli ([click here for more info](https://docs.docker.com/engine/reference/commandline/cli/))
+### Docker CLI
 
 ```bash
 docker run -d \
   --name=workstation \
-  --security-opt seccomp=unconfined `#optional` \
+  --security-opt seccomp=unconfined \
   -e PUID=1000 \
   -e PGID=1000 \
   -e TZ=Etc/UTC \
-  -e SUBFOLDER=/ `#optional` \
-  -e TITLE=csc_workstation `#optional` \
-  -p 3001:3001 \
+  -e PASSWORD=yourpassword \
+  -e TITLE="CSC Workstation" \
   -p 3000:3000 \
-  -v /path/to/data:/config \
-  -v /var/run/docker.sock:/var/run/docker.sock `#optional` \
-  --device /dev/dri:/dev/dri `#optional` \
-  --shm-size="1gb" `#optional` \
+  -p 3001:3001 \
+  -v workstation_data:/config \
+  --shm-size="1gb" \
   --restart unless-stopped \
   ghcr.io/csc-software-stack/workstation:latest
-
-
 ```
 
-## Parameters
+## Post-Deployment Setup
 
-Container images are configured using parameters passed at runtime (such as those above). These parameters are separated by a colon and indicate `<external>:<internal>` respectively. For example, `-p 8080:80` would expose port `80` from inside the container to be accessible from the host's IP on port `8080` outside the container.
-
-| Parameter | Function |
-| :----: | --- |
-| `-p 3000` | Web Desktop GUI |
-| `-p 3001` | Web Desktop GUI HTTPS |
-| `-e PUID=1000` | for UserID - see below for explanation |
-| `-e PGID=1000` | for GroupID - see below for explanation |
-| `-e TZ=Etc/UTC` | specify a timezone to use, see this [list](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List). |
-| `-e SUBFOLDER=/` | Specify a subfolder to use with reverse proxies, IE `/subfolder/` |
-| `-e TITLE=Webtop` | String which will be used as page/tab title in the web browser. |
-| `-v /config` | abc users home directory |
-| `-v /var/run/docker.sock` | Docker Socket on the system, if you want to use Docker in the container |
-| `--device /dev/dri` | Add this for GL support (Linux hosts only) |
-| `--shm-size=` | We set this to 1 gig to prevent modern web browsers from crashing |
-| `--security-opt seccomp=unconfined` | For Docker Engine only, many modern gui apps need this to function on older hosts as syscalls are unknown to Docker. |
-
-## Environment variables from files (Docker secrets)
-
-You can set any environment variable from a file by using a special prepend `FILE__`.
-
-As an example:
+After first launch, run the interactive setup script inside the container:
 
 ```bash
--e FILE__PASSWORD=/run/secrets/mysecretpassword
+/bin/bash /setup/scripts/setup.sh
 ```
 
-Will set the environment variable `PASSWORD` based on the contents of the `/run/secrets/mysecretpassword` file.
+This configures:
+1. **SSL Avoidance** - For networks with traffic inspection (clinical environments)
+2. **Desktop Themes** - Shortcuts, Yaru-dark theme, and UI customizations
+3. **Conda Environment** - Creates `developer` environment with common data science packages
+4. **VS Code Extensions** - Installs Python, Docker, Jupyter, and other extensions
 
-## Umask for running applications
+## SSL Certificate Configuration
 
-For all of our images we provide the ability to override the default umask settings for services started within the containers using the optional `-e UMASK=022` setting.
-Keep in mind umask is not chmod it subtracts from permissions based on it's value it does not add. Please read up [here](https://en.wikipedia.org/wiki/Umask) before asking for support.
+### Option 1: Custom CA Certificate (Recommended)
 
-## User / Group Identifiers
+Place your organization's CA certificate at `/config/ssl/cert.pem` before starting the container. On startup, the container will automatically configure:
 
-When using volumes (`-v` flags) permissions issues can arise between the host OS and the container, we avoid this issue by allowing you to specify the user `PUID` and group `PGID`.
+- System CA bundle (`update-ca-certificates`)
+- pip, conda, curl, wget, git, npm/node
+- Python `requests` library
+- Desktop session environment variables
 
-Ensure any volume directories on the host are owned by the same user you specify and any permissions issues will vanish like magic.
+### Option 2: SSL Avoidance Mode
 
-In this instance `PUID=1000` and `PGID=1000`, to find yours use `id user` as below:
+For networks where you cannot obtain the CA certificate, run `setup.sh` and select SSL avoidance. This disables SSL verification for package managers (use with caution).
+
+## Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `PUID` | 1000 | User ID for file permissions |
+| `PGID` | 1000 | Group ID for file permissions |
+| `TZ` | Etc/UTC | Timezone ([list](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)) |
+| `PASSWORD` | abc | Web interface password |
+| `TITLE` | KasmVNC Client | Browser tab title |
+| `SUBFOLDER` | / | Subfolder for reverse proxy (e.g., `/workstation/`) |
+| `CUSTOM_PORT` | 3000 | Internal HTTP port |
+| `CUSTOM_HTTPS_PORT` | 3001 | Internal HTTPS port |
+| `FM_HOME` | /config | File manager home directory |
+
+## Volumes
+
+| Path | Description |
+|------|-------------|
+| `/config` | User home directory - **persist this volume** |
+| `/config/ssl/cert.pem` | Custom CA certificate (optional) |
+| `/var/run/docker.sock` | Host Docker socket (optional) |
+
+## Deployment Profiles
+
+Pre-configured compose files are available in [application/](application/):
+
+| Profile | CPUs | RAM | GPU | Use Case |
+|---------|------|-----|-----|----------|
+| `docker-compose_standard.yml` | 4 | 16GB | No | General development |
+| `docker-compose_highmem.yml` | 8 | 64GB | No | Data processing |
+| `docker-compose_large.yml` | 16 | 48GB | No | Heavy workloads |
+| `docker-compose_gpu.yml` | 24 | 64GB | Yes | ML/AI training |
+
+Example with environment variables:
+```bash
+INSTANCE_ID=dev HTTP_PORT=3000 HTTPS_PORT=3001 PASSWORD=secret TITLE=DevWorkstation \
+  docker compose -f application/docker-compose_standard.yml up -d
+```
+
+## GPU Support
+
+For NVIDIA GPU passthrough:
+
+```yaml
+services:
+  workstation:
+    # ... other config ...
+    environment:
+      - DRINODE=/dev/dri/renderD128  # Optional: specific GPU
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+```
+
+The setup script auto-detects GPU availability and installs appropriate CUDA-enabled packages.
+
+## Building from Source
 
 ```bash
-  $ id username
-    uid=1000(dockeruser) gid=1000(dockergroup) groups=1000(dockergroup)
+git clone https://github.com/CSC-Software-Stack/Workstation.git
+cd Workstation/docker
+docker build -t workstation:local .
 ```
 
-### Via Docker Compose
+## Project Structure
 
-* Update all images: `docker-compose pull`
-  * or update a single image: `docker-compose pull webtop`
-* Let compose update all containers as necessary: `docker-compose up -d`
-  * or update a single container: `docker-compose up -d webtop`
-* You can also remove the old dangling images: `docker image prune`
-
-### Via Docker Run
-
-* Update the image: `docker pull ghcr.io/sampingram/csc-webtop:latest`
-* Stop the running container: `docker stop webtop`
-* Delete the container: `docker rm webtop`
-* Recreate a new container with the same docker run parameters as instructed above (if mapped correctly to a host folder, your `/config` folder and settings will be preserved)
-* You can also remove the old dangling images: `docker image prune`
-
-### Via Watchtower auto-updater (only use if you don't remember the original parameters)
-
-* Pull the latest image at its tag and replace it with the same env variables in one run:
-
-  ```bash
-  docker run --rm \
-  -v /var/run/docker.sock:/var/run/docker.sock \
-  containrrr/watchtower \
-  --run-once webtop
-  ```
-
-* You can also remove the old dangling images: `docker image prune`
-
-**Note:** We do not endorse the use of Watchtower as a solution to automated updates of existing Docker containers. In fact we generally discourage automated updates. However, this is a useful tool for one-time manual updates of containers where you have forgotten the original parameters. In the long term, we highly recommend using [Docker Compose](https://docs.linuxserver.io/general/docker-compose).
-
-### Image Update Notifications - Diun (Docker Image Update Notifier)
-
-* We recommend [Diun](https://crazymax.dev/diun/) for update notifications. Other tools that automatically update containers unattended are not recommended or supported.
-
-## Building locally
-
-If you want to make local modifications to these images for development purposes or just to customize the logic:
-
-```bash
-git clone https://github.com/SamPIngram/CSC-Software-Stack
-cd docker
-docker build \
-  --no-cache \
-  --pull \
-  -t webtop .
 ```
+docker/                    # Image build context
+├── Dockerfile            # Base image configuration
+├── root/                 # Files copied to container root filesystem
+│   ├── defaults/startwm.sh   # MATE session startup
+│   └── etc/
+│       ├── cont-init.d/      # Container init scripts (SSL setup)
+│       └── profile.d/        # Shell profile scripts
+└── setup/                # Post-deployment configuration
+    ├── conda/            # Environment definitions
+    ├── scripts/          # Interactive setup scripts
+    └── vscode/           # VS Code settings
+
+application/              # Deployment configurations
+└── docker-compose_*.yml  # Resource profile templates
+```
+
+## Important Notes
+
+- **Security**: Use `--security-opt seccomp=unconfined` for GUI app compatibility
+- **Persistence**: System-level changes (apt packages) are lost on container recreation; user home (`/config`) persists
+- **Shared Memory**: Set `--shm-size="1gb"` to prevent browser crashes
+
+## Troubleshooting
+
+### SSL/Certificate Errors
+1. Check if `/config/ssl/cert.pem` exists and is readable
+2. Restart the container to trigger certificate configuration
+3. Verify environment variables: `echo $SSL_CERT_FILE`
+
+### GUI Apps Not Starting
+Ensure `--security-opt seccomp=unconfined` is set in your run command.
+
+### Permission Issues
+Match `PUID`/`PGID` to your host user: `id username`
+
+## License
+
+See [LICENSE](LICENSE) for details.
+
+## Acknowledgments
+
+Built on [linuxserver/docker-baseimage-kasmvnc](https://github.com/linuxserver/docker-baseimage-kasmvnc)

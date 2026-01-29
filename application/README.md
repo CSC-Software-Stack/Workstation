@@ -1,27 +1,85 @@
-# CSC Workstaion
+# Deployment Configurations
 
-## Overview
-CSC Workstation gives users a full Ubuntu-based workstation in their web browser. This standard workstation comes with [VS Code](https://code.visualstudio.com/), [miniforge](https://github.com/conda-forge/miniforge) and [firefox](https://www.mozilla.org/en-GB/firefox/) installed for a strong foundational workspace for developers.
+This directory contains Docker Compose files with pre-configured resource profiles for different workloads.
 
-## Getting Started
-1. Clone the CSC-Software-Stack GitHub repository 
-```console
-git clone https://github.com/SamPIngram/CSC-Software-Stack.git
-```
-2. Navigate to this application. Should be within the `applications` directory.
-3. Make sure you have [docker-compose](https://docs.docker.com/compose/install/) installed.
-```console
-docker compose version
-```
-4. Launch the application, changing the included build-arguments as desired.
-```console
-docker compose up --build-arg INSTANCE_ID=TEST --build-arg HTTP_PORT=3000 --build-arg HTTPS_PORT=3001 --build-arg PASSWORD=abc --build-arg TITLE=csc_workstation
-```
+## Available Profiles
+
+| File | CPUs | Memory | GPU | Best For |
+|------|------|--------|-----|----------|
+| `docker-compose_standard.yml` | 4 | 16GB | No | General development, light workloads |
+| `docker-compose_highmem.yml` | 8 | 32GB | No | Data processing, larger datasets |
+| `docker-compose_large.yml` | 16 | 48GB | No | Heavy computation, multiple processes |
+| `docker-compose_gpu.yml` | 24 | 64GB | Yes | ML/AI training, GPU-accelerated tasks |
+
+## Required Environment Variables
+
+All compose files require these environment variables:
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `INSTANCE_ID` | Unique identifier for the instance | `dev`, `user1`, `prod` |
+| `HTTP_PORT` | External HTTP port | `3000` |
+| `HTTPS_PORT` | External HTTPS port | `3001` |
+| `PASSWORD` | Web interface password | `mysecretpassword` |
+| `TITLE` | Browser tab title | `My Workstation` |
+
+For GPU deployments:
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `GPU_ID` | NVIDIA GPU device ID | `0`, `1` |
 
 ## Usage
 
-On launch, the user will be presented with a login request. The standard user is `abc` and the password is set in the above `--build-arg PASSWORD=` command.
+### Using Environment Variables
 
-If you are setting up the workstation for a user or yourself there is a helpful setup bash script. This script adds shortcuts to apps on the desktop, installs several VS Code extensions and adds some SSL exceptions to downloading packages from standard code repositories. This has been done due to many clinical settings networks, which use network traffic surveillance, to appear as tampered with by external repositories which disables successful download of software packages. 
+```bash
+# Standard deployment
+INSTANCE_ID=dev HTTP_PORT=3000 HTTPS_PORT=3001 PASSWORD=secret TITLE=DevWorkstation \
+  docker compose -f docker-compose_standard.yml up -d
 
-![Alt text](image.png)
+# GPU deployment
+INSTANCE_ID=ml HTTP_PORT=3002 HTTPS_PORT=3003 PASSWORD=secret TITLE=ML-Workstation GPU_ID=0 \
+  docker compose -f docker-compose_gpu.yml up -d
+```
+
+### Using an Environment File
+
+Create a `.env` file:
+```bash
+INSTANCE_ID=myworkstation
+HTTP_PORT=3000
+HTTPS_PORT=3001
+PASSWORD=mysecretpassword
+TITLE=My CSC Workstation
+```
+
+Then run:
+```bash
+docker compose -f docker-compose_standard.yml up -d
+```
+
+## Multiple Instances
+
+Deploy multiple workstations on the same host using different instance IDs and ports:
+
+```bash
+# Instance 1
+INSTANCE_ID=user1 HTTP_PORT=3000 HTTPS_PORT=3001 PASSWORD=pass1 TITLE=User1 \
+  docker compose -f docker-compose_standard.yml up -d
+
+# Instance 2
+INSTANCE_ID=user2 HTTP_PORT=3002 HTTPS_PORT=3003 PASSWORD=pass2 TITLE=User2 \
+  docker compose -f docker-compose_standard.yml up -d
+```
+
+Each instance gets its own named volume (`csc_workstation-${INSTANCE_ID}`) for persistent storage.
+
+## Stopping and Removing
+
+```bash
+# Stop
+INSTANCE_ID=dev docker compose -f docker-compose_standard.yml down
+
+# Stop and remove volumes (destroys user data!)
+INSTANCE_ID=dev docker compose -f docker-compose_standard.yml down -v
+```

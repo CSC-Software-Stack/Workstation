@@ -29,8 +29,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "24"
-          memory: "64g"
+          cpus: "16"
+          memory: "48g"
 
 volumes:
   instance-storage:

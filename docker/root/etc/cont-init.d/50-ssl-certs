@@ -6,6 +6,7 @@ CERT_PATH="/config/ssl/cert.pem"
 CERT_KEY_PATH="/config/ssl/cert.key"
 SYSTEM_CERT_DIR="/usr/local/share/ca-certificates"
 ENV_FILE="/config/.ssl_env"
+ABC_HOME="/config"
 
 if [[ -f "$CERT_PATH" ]]; then
     echo "**** Custom SSL certificate found, configuring... ****"
@@ -15,7 +16,7 @@ if [[ -f "$CERT_PATH" ]]; then
     cp "$CERT_PATH" "$SYSTEM_CERT_DIR/custom-cert.crt"
     update-ca-certificates
     
-    # Create environment file that will be sourced by bashrc
+    # Create environment file that will be sourced by bashrc and desktop session
     cat > "$ENV_FILE" << 'EOF'
 # Custom SSL certificate configuration
 export SSL_CERT_FILE="/config/ssl/cert.pem"
@@ -25,6 +26,38 @@ export NODE_EXTRA_CA_CERTS="/config/ssl/cert.pem"
 export PIP_CERT="/config/ssl/cert.pem"
 export GIT_SSL_CAINFO="/config/ssl/cert.pem"
 EOF
+    
+    # Ensure user abc can read the env file
+    chown abc:abc "$ENV_FILE"
+    chmod 644 "$ENV_FILE"
+    
+    # Add sourcing to user's .bashrc if not already present (for non-login shells)
+    BASHRC_FILE="$ABC_HOME/.bashrc"
+    BASHRC_SOURCE_LINE='[[ -f /config/.ssl_env ]] && source /config/.ssl_env'
+    if [[ -f "$BASHRC_FILE" ]]; then
+        if ! grep -qF ".ssl_env" "$BASHRC_FILE"; then
+            echo "" >> "$BASHRC_FILE"
+            echo "# Source custom SSL certificate environment" >> "$BASHRC_FILE"
+            echo "$BASHRC_SOURCE_LINE" >> "$BASHRC_FILE"
+        fi
+    else
+        echo "# Source custom SSL certificate environment" > "$BASHRC_FILE"
+        echo "$BASHRC_SOURCE_LINE" >> "$BASHRC_FILE"
+        chown abc:abc "$BASHRC_FILE"
+    fi
+    
+    # Create pam_environment for user session environment (affects graphical session)
+    PAM_ENV_FILE="$ABC_HOME/.pam_environment"
+    cat > "$PAM_ENV_FILE" << 'EOF'
+SSL_CERT_FILE DEFAULT=/config/ssl/cert.pem
+REQUESTS_CA_BUNDLE DEFAULT=/config/ssl/cert.pem
+CURL_CA_BUNDLE DEFAULT=/config/ssl/cert.pem
+NODE_EXTRA_CA_CERTS DEFAULT=/config/ssl/cert.pem
+PIP_CERT DEFAULT=/config/ssl/cert.pem
+GIT_SSL_CAINFO DEFAULT=/config/ssl/cert.pem
+EOF
+    chown abc:abc "$PAM_ENV_FILE"
+    chmod 644 "$PAM_ENV_FILE"
     
     # Configure conda to use custom cert
     if [[ -f /miniforge/bin/conda ]]; then
@@ -52,4 +85,5 @@ else
     
     # Remove env file if cert was removed
     rm -f "$ENV_FILE"
+    rm -f "$ABC_HOME/.pam_environment"
 fi
