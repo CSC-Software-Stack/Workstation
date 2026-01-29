@@ -65,7 +65,7 @@ Here are some example snippets to help you get started creating a container.
 version: "2.1"
 services:
   workstation:
-    image: ghcr.io/sampingram/csc-workstation-base:latest
+    image: ghcr.io/csc-software-stack/workstation:latest
     container_name: workstation
     security_opt:
       - seccomp:unconfined #optional
@@ -105,7 +105,7 @@ docker run -d \
   --device /dev/dri:/dev/dri `#optional` \
   --shm-size="1gb" `#optional` \
   --restart unless-stopped \
-  ghcr.io/sampingram/csc-workstation-base:latest
+  ghcr.io/csc-software-stack/workstation:latest
 
 
 ```

@@ -1,0 +1,55 @@
+#!/usr/bin/with-contenv bash
+# This script runs on container startup via linuxserver's s6-overlay
+# It configures custom SSL certificates if they exist at /config/ssl/cert.pem
+
+CERT_PATH="/config/ssl/cert.pem"
+CERT_KEY_PATH="/config/ssl/cert.key"
+SYSTEM_CERT_DIR="/usr/local/share/ca-certificates"
+ENV_FILE="/config/.ssl_env"
+
+if [[ -f "$CERT_PATH" ]]; then
+    echo "**** Custom SSL certificate found, configuring... ****"
+    
+    # Copy cert to system CA directory and update CA bundle
+    mkdir -p "$SYSTEM_CERT_DIR"
+    cp "$CERT_PATH" "$SYSTEM_CERT_DIR/custom-cert.crt"
+    update-ca-certificates
+    
+    # Create environment file that will be sourced by bashrc
+    cat > "$ENV_FILE" << 'EOF'
+# Custom SSL certificate configuration
+export SSL_CERT_FILE="/config/ssl/cert.pem"
+export REQUESTS_CA_BUNDLE="/config/ssl/cert.pem"
+export CURL_CA_BUNDLE="/config/ssl/cert.pem"
+export NODE_EXTRA_CA_CERTS="/config/ssl/cert.pem"
+export PIP_CERT="/config/ssl/cert.pem"
+export GIT_SSL_CAINFO="/config/ssl/cert.pem"
+EOF
+    
+    # Configure conda to use custom cert
+    if [[ -f /miniforge/bin/conda ]]; then
+        /miniforge/bin/conda config --system --set ssl_verify "$CERT_PATH"
+    fi
+    
+    # Configure git globally
+    git config --system http.sslCAInfo "$CERT_PATH"
+    
+    # Configure pip globally
+    mkdir -p /etc/pip
+    cat > /etc/pip.conf << EOF
+[global]
+cert = $CERT_PATH
+EOF
+    
+    # Configure wget
+    cat > /etc/wgetrc << EOF
+ca_certificate = $CERT_PATH
+EOF
+
+    echo "**** SSL certificate configuration complete ****"
+else
+    echo "**** No custom SSL certificate found at $CERT_PATH, skipping SSL config ****"
+    
+    # Remove env file if cert was removed
+    rm -f "$ENV_FILE"
+fi

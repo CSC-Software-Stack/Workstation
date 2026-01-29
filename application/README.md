@@ -1,7 +1,7 @@
 # CSC Workstaion
 
 ## Overview
-CSC Workstation gives users a full Ubuntu-based workstation in their web browser. This standard workstation comes with [VS Code](https://code.visualstudio.com/), [miniconda](https://docs.conda.io/projects/miniconda/en/latest/) and [firefox](https://www.mozilla.org/en-GB/firefox/) installed for a strong foundational workspace for developers.
+CSC Workstation gives users a full Ubuntu-based workstation in their web browser. This standard workstation comes with [VS Code](https://code.visualstudio.com/), [miniforge](https://github.com/conda-forge/miniforge) and [firefox](https://www.mozilla.org/en-GB/firefox/) installed for a strong foundational workspace for developers.
 
 ## Getting Started
 1. Clone the CSC-Software-Stack GitHub repository 

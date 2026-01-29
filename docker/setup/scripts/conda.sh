@@ -1,24 +1,23 @@
 #!/bin/bash
 ssl_avoid="$1"
 
-# Conda
-echo Changing permissions on miniconda. This can take a while.
-sudo chown -R abc /miniconda
+# Miniforge (includes mamba by default)
+echo Changing permissions on miniforge. This can take a while.
+sudo chown -R abc /miniforge
 if [ $ssl_avoid = y ] || [ $ssl_avoid = Y ]; then
     echo "ssl set to avoid"
-    /miniconda/bin/conda config --set ssl_verify False 
+    /miniforge/bin/conda config --set ssl_verify False 
 fi
-/miniconda/bin/conda update -y conda
-/miniconda/bin/conda init
+/miniforge/bin/conda update -y conda
+/miniforge/bin/conda init
 source ~/.bashrc
-conda install -c conda-forge mamba -y
 gpu=$(which nvidia-smi)
 if [[ $gpu == '/usr/bin/nvidia-smi' ]]; then
   echo Nvidia GPU found. Installing GPU standard env.
-  mamba env create -f /setup/conda/standard_gpu_env.yaml --prefix ~/.conda/envs/developer --force
+  mamba env create -f /setup/conda/standard_gpu_env.yaml --prefix ~/.conda/envs/developer
 else
   echo No Nvidia GPU found. Installing standard env.
-  mamba env create -f /setup/conda/standard_env.yaml --prefix ~/.conda/envs/developer --force
+  mamba env create -f /setup/conda/standard_env.yaml --prefix ~/.conda/envs/developer
 fi
 
 conda activate developer

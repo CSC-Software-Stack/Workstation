@@ -18,11 +18,11 @@ sudo cp /usr/share/applications/mate-terminal.desktop /config/Desktop/
 sudo cp /usr/share/applications/firefox.desktop /config/Desktop/
 sudo cp /usr/share/applications/code.desktop /config/Desktop/
 
-# Conda
-sudo chown -R abc /miniconda
-/miniconda/bin/conda config --set ssl_verify False
-/miniconda/bin/conda update -y conda
-/miniconda/bin/conda init
+# Miniforge
+sudo chown -R abc /miniforge
+/miniforge/bin/conda config --set ssl_verify False
+/miniforge/bin/conda update -y conda
+/miniforge/bin/conda init
 source ~/.bashrc
 conda create --prefix ~/.conda/envs/developer -y
 conda activate developer
