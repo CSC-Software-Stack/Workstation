@@ -24,7 +24,7 @@ services:
       - ${HTTPS_PORT}:3001
     devices:
       - /dev/dri:/dev/dri #optional
-    shm_size: "1gb" #optional
+    shm_size: "24gb" #optional
     restart: unless-stopped
     deploy:
       resources:
