@@ -7,6 +7,7 @@ A Docker-based Ubuntu desktop workstation accessible via web browser, built on [
 - **Full Ubuntu Desktop** - MATE desktop environment accessible from any modern web browser
 - **Pre-installed Development Tools**:
   - [VS Code](https://code.visualstudio.com/) - Code editor
+  - [uv](https://docs.astral.sh/uv/) - An extremely fast Python package and project manager, written in Rust
   - [Miniforge](https://github.com/conda-forge/miniforge) - Conda package manager with mamba
   - [Google Chrome](https://www.google.com/chrome/) - Web browser
   - [GitHub Desktop](https://github.com/shiftkey/desktop) - Git GUI client
