@@ -56,6 +56,19 @@ RUN \
   git \
   mercurial \
   subversion && \
+  echo "**** install QT dependencies ****" && \
+  apt-get install -y \
+  libqt5gui5 \
+  libqt5dbus5 \
+  libqt5core5a \
+  libxcb-icccm4 \
+  libxcb-image0 \
+  libxcb-keysyms1 \
+  libxcb-render-util0 \
+  libxcb-xinerama0 \
+  libxcb-xkb1 \
+  libxkbcommon-x11-0 && \
+  ldconfig && \
   echo "**** install uv ****" && \
   curl -LsSf https://astral.sh/uv/install.sh | sh && \
   echo "**** install miniforge ****" && \

@@ -19,4 +19,4 @@ code --install-extension wayou.vscode-todo-highlight
 code --install-extension vscode-icons-team.vscode-icons
 code --install-extension grapecity.gc-excelviewer
 code --install-extension oderwat.indent-rainbow
-wget -qO- https://raw.githubusercontent.com/harry-cpp/code-nautilus/master/install.sh | bash
+code --install-extension francescaFati.medview
