@@ -92,9 +92,9 @@ RUN \
   apt install dconf-cli dconf-editor -y && \
   apt install caja-open-terminal -y && \
   apt install file-roller -y && \
-  wget https://github.com/shiftkey/desktop/releases/download/release-3.4.9-linux1/GitHubDesktop-linux-amd64-3.4.9-linux1.deb && \
-  apt install ./GitHubDesktop-linux-amd64-3.4.9-linux1.deb -y && \
-  rm GitHubDesktop-linux-amd64-3.4.9-linux1.deb
+  wget https://github.com/shiftkey/desktop/releases/download/release-3.4.13-linux1/GitHubDesktop-linux-amd64-3.4.13-linux1.deb && \
+  apt install ./GitHubDesktop-linux-amd64-3.4.13-linux1.deb -y && \
+  rm GitHubDesktop-linux-amd64-3.4.13-linux1.deb
 
 # add local files
 COPY /root /
