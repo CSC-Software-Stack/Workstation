@@ -1,6 +1,6 @@
 # CSC Workstation
 
-A Docker-based Ubuntu desktop workstation accessible via web browser, built on [linuxserver/docker-baseimage-kasmvnc](https://github.com/linuxserver/docker-baseimage-kasmvnc). Provides a MATE desktop environment with development tools pre-installed—designed for clinical and enterprise settings with SSL/certificate workarounds.
+A Docker-based Ubuntu desktop workstation accessible via web browser, built on [linuxserver/docker-baseimage-kasmvnc](https://github.com/linuxserver/docker-baseimage-kasmvnc). Provides a MATE desktop environment with development tools pre-installed—designed for clinical and enterprise settings with SSL/certificate configurations.
 
 ## Features
 
