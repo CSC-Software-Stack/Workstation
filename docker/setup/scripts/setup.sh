@@ -3,17 +3,6 @@
 # General
 sudo chown -R abc ~/
 
-# SSL
-printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' =
-read -p "Do you want to add ssl avoidance? (y/n) " yn1
-
-case $yn1 in 
-	[yY] ) echo ok, adding ssl avoidance;
-        /bin/bash /setup/scripts/ssl_avoid.sh;;
-	[nN] ) echo skipping ssl avoidance...;;
-	* ) echo invalid response. moving on.;;
-esac
-printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' =
 # Themes
 printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' =
 read -p "Do you want to set default CSC themes? (y/n) " yn2

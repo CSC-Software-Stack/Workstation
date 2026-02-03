@@ -1,7 +1,6 @@
 name: developer
 channels:
   - plotly
-  - anaconda
   - conda-forge
   - defaults
 dependencies:

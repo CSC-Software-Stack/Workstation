@@ -38,7 +38,7 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
-      - PASSWORD=yourpassword
+      - PASSWORD=abc
       - TITLE=CSC Workstation
     volumes:
       - workstation_data:/config
@@ -62,7 +62,7 @@ docker run -d \
   -e PUID=1000 \
   -e PGID=1000 \
   -e TZ=Etc/UTC \
-  -e PASSWORD=yourpassword \
+  -e PASSWORD=abc \
   -e TITLE="CSC Workstation" \
   -p 3000:3000 \
   -p 3001:3001 \

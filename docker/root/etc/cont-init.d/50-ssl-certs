@@ -59,11 +59,6 @@ EOF
     chown abc:abc "$PAM_ENV_FILE"
     chmod 644 "$PAM_ENV_FILE"
     
-    # Configure conda to use custom cert
-    if [[ -f /miniforge/bin/conda ]]; then
-        /miniforge/bin/conda config --system --set ssl_verify "$CERT_PATH"
-    fi
-    
     # Configure git globally
     git config --system http.sslCAInfo "$CERT_PATH"
     

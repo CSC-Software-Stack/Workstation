@@ -6,9 +6,8 @@ mkdir -p ~/.config/Code/User/
 touch ~/.config/Code/User/settings.json
 if [ $ssl_avoid = y ] || [ $ssl_avoid = Y ]; then
     echo "ssl set to avoid"
-    cp /setup/vscode/settings_nossl.json ~/.config/Code/User/settings.json
 else
-    cp /setup/vscode/settings.json ~/.config/Code/User/settings.json
+cp /setup/vscode/settings.json ~/.config/Code/User/settings.json
 fi
 
 code --install-extension ms-python.python

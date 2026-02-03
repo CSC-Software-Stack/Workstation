@@ -22,3 +22,6 @@ else
     echo "Options = UnsafeLegacyRenegotiation" | sudo tee -a /etc/ssl/openssl.cnf
 fi
 printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+
+cp /setup/vscode/settings_nossl.json ~/.config/Code/User/settings.json
+/miniforge/bin/conda config --set ssl_verify False 

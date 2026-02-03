@@ -1,18 +1,10 @@
 #!/bin/bash
-ssl_avoid="$1"
 
-# Miniforge needs these unset to avoid SSL issues during setup
-unset REQUESTS_CA_BUNDLE
-unset SSL_CERT_FILE
-unset CURL_CA_BUNDLE
 
 # Miniforge (includes mamba by default)
 echo Changing permissions on miniforge. This can take a while.
 sudo chown -R abc /miniforge
-if [ $ssl_avoid = y ] || [ $ssl_avoid = Y ]; then
-    echo "ssl set to avoid"
-    /miniforge/bin/conda config --set ssl_verify False 
-fi
+/miniforge/bin/conda config --set ssl_verify True 
 /miniforge/bin/conda update -y conda
 /miniforge/bin/conda init
 source ~/.bashrc
