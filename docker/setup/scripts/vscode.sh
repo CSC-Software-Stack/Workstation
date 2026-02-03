@@ -1,14 +1,9 @@
 #!/bin/bash
-ssl_avoid="$1"
-
 # VS Code
 mkdir -p ~/.config/Code/User/
 touch ~/.config/Code/User/settings.json
-if [ $ssl_avoid = y ] || [ $ssl_avoid = Y ]; then
-    echo "ssl set to avoid"
-else
+
 cp /setup/vscode/settings.json ~/.config/Code/User/settings.json
-fi
 
 code --install-extension ms-python.python
 code --install-extension ms-azuretools.vscode-docker
