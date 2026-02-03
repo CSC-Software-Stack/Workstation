@@ -1,5 +1,7 @@
 #!/bin/bash
-
+unset REQUESTS_CA_BUNDLE
+unset SSL_CERT_FILE
+unset CURL_CA_BUNDLE
 
 # Miniforge (includes mamba by default)
 echo Changing permissions on miniforge. This can take a while.
